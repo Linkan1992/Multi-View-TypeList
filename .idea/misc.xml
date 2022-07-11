@@ -3,7 +3,12 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/drawable/ic_submit.xml" value="0.22916666666666666" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.21302083333333333" />
+        <entry key="app/src/main/res/layout/item_comment_type_row.xml" value="0.21302083333333333" />
+        <entry key="app/src/main/res/layout/item_photo_type_row.xml" value="0.21302083333333333" />
+        <entry key="app/src/main/res/layout/item_single_choice_row.xml" value="0.21302083333333333" />
+        <entry key="app/src/main/res/menu/multi_view_menu.xml" value="0.25" />
       </map>
     </option>
   </component>

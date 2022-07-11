@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">MultiviewTypeList</string>
+    <string name="print_id">Print Item Id\'s</string>
+    <string name="item_list">Item List</string>
 </resources>

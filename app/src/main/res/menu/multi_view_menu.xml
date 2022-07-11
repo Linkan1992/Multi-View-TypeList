@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_print_id"
+        android:icon="@drawable/ic_submit"
+        android:title="@string/print_id"
+        android:visible="true"
+        app:showAsAction="always" />
+
+</menu>
