@@ -26,6 +26,19 @@
                 app:titleTextColor="@color/white" />
         </com.google.android.material.appbar.AppBarLayout>
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rview_item"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/app_bar_layout"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:itemCount="5"
+            tools:listitem="@layout/item_photo_type_row"
+            app:layout_constraintVertical_bias="0"/>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
