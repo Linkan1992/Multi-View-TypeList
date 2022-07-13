@@ -1,19 +1,32 @@
 package com.linkan.multiviewtypelist.adapter
 
+import android.net.Uri
+import android.text.TextUtils
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.linkan.multiviewtypelist.R
 import com.linkan.multiviewtypelist.databinding.ItemCommentTypeRowBinding
 import com.linkan.multiviewtypelist.databinding.ItemPhotoTypeRowBinding
 import com.linkan.multiviewtypelist.databinding.ItemSingleChoiceRowBinding
 import com.linkan.multiviewtypelist.dto.ItemModel
+import com.linkan.multiviewtypelist.util.UtilFunction
 import com.linkan.multiviewtypelist.util.ViewType
+import java.io.File
 
 class MultiViewListAdapter :
     ListAdapter<ItemModel, MultiViewListAdapter.BaseViewHolder>(ItemModelDiffCallback()) {
+
+    private val selectedItemLiveData : MutableLiveData<Int> = MutableLiveData()
+
+    val mSelectedItemLiveData : MutableLiveData<Int>
+        get() = selectedItemLiveData
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder =
         when (viewType) {
@@ -37,7 +50,7 @@ class MultiViewListAdapter :
         holder.bind(itemModel)
     }
 
-    class PhotoViewHolder constructor(private val binding: ItemPhotoTypeRowBinding) :
+    inner class PhotoViewHolder constructor(private val binding: ItemPhotoTypeRowBinding) :
         BaseViewHolder(binding) {
 
         override fun bind(item: ItemModel) {
@@ -47,6 +60,26 @@ class MultiViewListAdapter :
             // When a variable or observable changes, the binding will be scheduled to change before
             // the next frame. There are times, however, when binding must be executed immediately.
             // To force execution, use the executePendingBindings() method.
+
+            val photoPathFile = item.dataMapModel?.photoPath.run { File(this ?: "") }
+
+            Glide.with(itemView)
+               // .load(item.dataMapModel?.photoPath) // Uri of the picture
+                .load(Uri.fromFile(photoPathFile))
+                .placeholder(R.drawable.dummy_profile)
+                .into(binding.imgvPhoto)
+
+            binding.imgvClose.visibility = if (!TextUtils.isEmpty(item.dataMapModel?.photoPath))
+                View.VISIBLE else View.GONE
+
+            binding.imgvClose.setOnClickListener {
+                item.dataMapModel?.photoPath = null
+                notifyItemChanged(adapterPosition)
+            }
+
+            binding.imgvPhoto.setOnClickListener {
+                selectedItemLiveData.postValue(adapterPosition)
+            }
         }
     }
 
