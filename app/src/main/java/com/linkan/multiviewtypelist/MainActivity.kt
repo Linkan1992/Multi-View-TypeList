@@ -1,6 +1,6 @@
 package com.linkan.multiviewtypelist
 
-import android.Manifest
+
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Rect
@@ -8,11 +8,12 @@ import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Environment
 import android.provider.MediaStore
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -22,6 +23,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.linkan.multiviewtypelist.adapter.ItemClickedCallback
 import com.linkan.multiviewtypelist.adapter.MultiViewListAdapter
 import com.linkan.multiviewtypelist.databinding.ActivityMainBinding
 import com.linkan.multiviewtypelist.dto.ItemModel
@@ -39,9 +42,46 @@ class MainActivity : AppCompatActivity() {
 
      var selectedListItemPosition : Int = -1
 
+     var isPhotoEnlarged = false
+
      private val mViewModel : MainViewModel by lazy {
          ViewModelProvider(this).get(MainViewModel::class.java)
      }
+
+    private val itemClickCallback = object : ItemClickedCallback {
+
+        override fun capturePhoto(position: Int, item: ItemModel) {
+            selectedListItemPosition = position
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                val hasPermission = PermissionUtil.checkPermission(this@MainActivity, PermissionUtil.permissionArray)
+
+                if(!hasPermission){
+                    // request permission
+                    PermissionUtil.requestPermission(this@MainActivity, PermissionUtil.permissionArray, PermissionUtil.REQUEST_CAMERA)
+                }else{
+                    capturePicture()
+                }
+            }else{
+                capturePicture()
+            }
+        }
+
+        override fun enlargePhoto(item: ItemModel) {
+
+            isPhotoEnlarged = true
+
+            val photoPathFile = item.dataMapModel?.photoPath.run { File(this ?: "") }
+
+            Glide.with(this@MainActivity)
+                .load(Uri.fromFile(photoPathFile))
+                .into(mDataBinding.imgvEnlarge)
+
+            mDataBinding.imgvEnlarge.visibility = View.VISIBLE
+           // mDataBinding.imgvEnlarge.startAnimation(AnimationUtils.loadAnimation(this@MainActivity, R.anim.zoom_in))
+        }
+
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,10 +89,24 @@ class MainActivity : AppCompatActivity() {
         mDataBinding.vm = mViewModel
 
         initActionBar()
+        initClickListener()
         initRecyclerView()
         subscribeToLiveData()
 
         mViewModel.loadItemListFromAsset(this@MainActivity.assets)
+    }
+
+    private fun initClickListener() {
+        mDataBinding.imgvEnlarge.setOnClickListener {
+            resetEnlargePhotoVisibility()
+        }
+    }
+
+    private fun resetEnlargePhotoVisibility(){
+        if (isPhotoEnlarged) {
+            mDataBinding.imgvEnlarge.visibility = View.GONE
+            isPhotoEnlarged = false
+        }
     }
 
     private fun subscribeToLiveData() {
@@ -62,7 +116,7 @@ class MainActivity : AppCompatActivity() {
 
         listItemAdapter.mSelectedItemLiveData.observe(this@MainActivity, Observer { item ->
 
-            selectedListItemPosition = item
+           /* selectedListItemPosition = item
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
                 val hasPermission = PermissionUtil.checkPermission(this, PermissionUtil.permissionArray)
@@ -75,7 +129,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }else{
                 capturePicture()
-            }
+            }*/
            // listItemAdapter.submitList(itemList.toMutableList())
         })
     }
@@ -114,7 +168,7 @@ class MainActivity : AppCompatActivity() {
                 setDrawable(ContextCompat.getDrawable(context, R.drawable.divider)!!)
             })
         }
-        listItemAdapter = MultiViewListAdapter()
+        listItemAdapter = MultiViewListAdapter(itemClickCallback)
         mDataBinding.rviewItem.adapter = listItemAdapter
 
     }
@@ -205,6 +259,16 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+    }
+
+    override fun onBackPressed() {
+        if (isPhotoEnlarged){
+            resetEnlargePhotoVisibility()
+            return
+        }
+
+        super.onBackPressed()
 
     }
 

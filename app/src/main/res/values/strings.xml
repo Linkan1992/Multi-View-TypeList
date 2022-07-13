@@ -3,4 +3,7 @@
     <string name="print_id">Print Item Id\'s</string>
     <string name="item_list">Item List</string>
     <string name="photo_title">Photo Title</string>
+    <string name="label_provide_comment">Provide Comment?</string>
+    <string name="type_comment">Type comment</string>
+    <string name="txt_dummy_comment">kjbdkbakbd akbdkabskdbaskbdka asdbasdbkasbdk ahdbasbdksabkdbadaaskbdkjasbdkasbkdbaskb asbdasbdkasbkdbas akjbdaskbdkasb asdkbaskdbaskbdkasbd askdbaskdbaskbd</string>
 </resources>

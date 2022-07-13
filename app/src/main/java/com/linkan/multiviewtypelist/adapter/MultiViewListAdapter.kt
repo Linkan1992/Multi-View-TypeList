@@ -16,11 +16,10 @@ import com.linkan.multiviewtypelist.databinding.ItemCommentTypeRowBinding
 import com.linkan.multiviewtypelist.databinding.ItemPhotoTypeRowBinding
 import com.linkan.multiviewtypelist.databinding.ItemSingleChoiceRowBinding
 import com.linkan.multiviewtypelist.dto.ItemModel
-import com.linkan.multiviewtypelist.util.UtilFunction
 import com.linkan.multiviewtypelist.util.ViewType
 import java.io.File
 
-class MultiViewListAdapter :
+class MultiViewListAdapter(private val itemClickedCallback: ItemClickedCallback) :
     ListAdapter<ItemModel, MultiViewListAdapter.BaseViewHolder>(ItemModelDiffCallback()) {
 
     private val selectedItemLiveData : MutableLiveData<Int> = MutableLiveData()
@@ -61,11 +60,14 @@ class MultiViewListAdapter :
             // the next frame. There are times, however, when binding must be executed immediately.
             // To force execution, use the executePendingBindings() method.
 
+            binding.tvTitle.text = item.title
+
             val photoPathFile = item.dataMapModel?.photoPath.run { File(this ?: "") }
 
             Glide.with(itemView)
                // .load(item.dataMapModel?.photoPath) // Uri of the picture
                 .load(Uri.fromFile(photoPathFile))
+                .centerCrop()
                 .placeholder(R.drawable.dummy_profile)
                 .into(binding.imgvPhoto)
 
@@ -78,7 +80,14 @@ class MultiViewListAdapter :
             }
 
             binding.imgvPhoto.setOnClickListener {
+
                 selectedItemLiveData.postValue(adapterPosition)
+
+                if (!TextUtils.isEmpty(item.dataMapModel?.photoPath))
+                    itemClickedCallback.enlargePhoto(item)
+                else
+                    itemClickedCallback.capturePhoto(adapterPosition, item)
+
             }
         }
     }
@@ -102,11 +111,15 @@ class MultiViewListAdapter :
 
         override fun bind(item: ItemModel) {
 
+            binding.item = ItemCommentViewModel(item)
+
             binding.executePendingBindings()
             // Immediate Binding
             // When a variable or observable changes, the binding will be scheduled to change before
             // the next frame. There are times, however, when binding must be executed immediately.
             // To force execution, use the executePendingBindings() method.
+
+            binding.tvTitle.text = item.title
         }
     }
 
@@ -137,6 +150,14 @@ class MultiViewListAdapter :
     override fun getItemViewType(position: Int): Int {
         return ViewType.getItemViewType(getItem(position).viewType)
     }
+
+}
+
+interface ItemClickedCallback{
+
+    fun capturePhoto(position : Int, item : ItemModel)
+
+    fun enlargePhoto(item : ItemModel)
 
 }
 

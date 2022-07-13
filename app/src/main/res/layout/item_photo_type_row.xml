@@ -8,14 +8,14 @@
         android:layout_height="wrap_content"
         android:background="@color/c_black_33C5C8CD">
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tv_title"
+            style="@style/HeaderTitleText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/spacing_16"
             android:layout_marginVertical="@dimen/spacing_16"
             android:text="Hello World!"
-            android:textColor="#37474F"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="@string/photo_title"/>
@@ -36,8 +36,8 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/imgv_close"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/spacing_20"
+            android:layout_height="@dimen/spacing_20"
             app:srcCompat="@drawable/ic_close_grey"
             app:layout_constraintTop_toTopOf="@id/imgv_photo"
             app:layout_constraintEnd_toEndOf="@id/imgv_photo"

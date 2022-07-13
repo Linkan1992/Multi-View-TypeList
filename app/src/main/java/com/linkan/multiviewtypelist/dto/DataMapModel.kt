@@ -10,6 +10,6 @@ data class DataMapModel(
     @SerializedName(JsonKeys.KEY_PHOTO_PATH)
     var photoPath : String? = null,
     @SerializedName(JsonKeys.KEY_COMMENT)
-    val commentText : String? = null
+    val commentModel : CommentModel? = CommentModel()
 
 )
