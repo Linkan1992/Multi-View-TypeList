@@ -129,7 +129,7 @@ class MultiViewListAdapter(private val itemClickedCallback: ItemClickedCallback)
                  this.submitList(item.dataMapModel?.choiceList?.toMutableList())
             }
 
-            binding.rviewItemChoice.setRecycledViewPool(viewPool)
+           // binding.rviewItemChoice.setRecycledViewPool(viewPool)
         }
 
     }

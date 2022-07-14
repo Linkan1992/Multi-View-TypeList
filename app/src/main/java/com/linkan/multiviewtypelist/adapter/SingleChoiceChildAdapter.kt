@@ -59,6 +59,8 @@ class SingleChoiceChildAdapter(private val callback: SingleChoiceCallback) : Lis
 
                 binding.choiceIcon.setOnClickListener {
 
+                   // itemView.setTag(binding.choiceIcon.id, true)
+
                     // updating new selected position
                     val dataModel = callback.getDataMapModel()
                     val list = dataModel?.choiceList
@@ -77,7 +79,9 @@ class SingleChoiceChildAdapter(private val callback: SingleChoiceCallback) : Lis
                         }
                     }
 
-                    callback.notifyItemChangedToParent()
+                    notifyDataSetChanged()
+
+                //    callback.notifyItemChangedToParent()
 
                 }
 
