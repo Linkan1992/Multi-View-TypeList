@@ -23,11 +23,6 @@ class MultiViewListAdapter(private val itemClickedCallback: ItemClickedCallback)
 
     private val viewPool = RecyclerView.RecycledViewPool()
 
-    private val selectedItemLiveData : MutableLiveData<Int> = MutableLiveData()
-
-    val mSelectedItemLiveData : MutableLiveData<Int>
-        get() = selectedItemLiveData
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder =
         when (viewType) {
             ViewType.TYPE_PHOTO_VIEW -> PhotoViewHolder(
@@ -82,8 +77,10 @@ class MultiViewListAdapter(private val itemClickedCallback: ItemClickedCallback)
 
             binding.imgvPhoto.setOnClickListener {
 
-                selectedItemLiveData.postValue(adapterPosition)
-
+                /**
+                 * if photoPath = null --> photo is not captured
+                 * if photoPath = "path/" --> photo is captured
+                 */
                 if (!TextUtils.isEmpty(item.dataMapModel?.photoPath))
                     itemClickedCallback.enlargePhoto(item)
                 else
@@ -113,11 +110,9 @@ class MultiViewListAdapter(private val itemClickedCallback: ItemClickedCallback)
             binding.rviewItemChoice.itemAnimator = DefaultItemAnimator()
             binding.rviewItemChoice.adapter = SingleChoiceChildAdapter(object : SingleChoiceCallback{
                 override fun notifyItemChangedToParent() {
-                    /*binding.rviewItemChoice.post {
+                    binding.rviewItemChoice.post {
                        notifyItemChanged(adapterPosition)
-                    }*/
-
-                    notifyItemChanged(adapterPosition)
+                    }
                 }
 
                 override fun getDataMapModel(): DataMapModel? {

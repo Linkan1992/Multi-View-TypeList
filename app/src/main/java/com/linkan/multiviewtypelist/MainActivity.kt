@@ -12,8 +12,6 @@ import android.provider.MediaStore
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -36,6 +34,8 @@ import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
 
+    private val TAG = "MainActivity"
+
     val REQUEST_IMAGE_CAPTURE = 1
 
      lateinit var mDataBinding : ActivityMainBinding
@@ -48,41 +48,6 @@ class MainActivity : AppCompatActivity() {
      private val mViewModel : MainViewModel by lazy {
          ViewModelProvider(this).get(MainViewModel::class.java)
      }
-
-    private val itemClickCallback = object : ItemClickedCallback {
-
-        override fun capturePhoto(position: Int, item: ItemModel) {
-            selectedListItemPosition = position
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-                val hasPermission = PermissionUtil.checkPermission(this@MainActivity, PermissionUtil.permissionArray)
-
-                if(!hasPermission){
-                    // request permission
-                    PermissionUtil.requestPermission(this@MainActivity, PermissionUtil.permissionArray, PermissionUtil.REQUEST_CAMERA)
-                }else{
-                    capturePicture()
-                }
-            }else{
-                capturePicture()
-            }
-        }
-
-        override fun enlargePhoto(item: ItemModel) {
-
-            isPhotoEnlarged = true
-
-            val photoPathFile = item.dataMapModel?.photoPath.run { File(this ?: "") }
-
-            Glide.with(this@MainActivity)
-                .load(Uri.fromFile(photoPathFile))
-                .into(mDataBinding.imgvEnlarge)
-
-            mDataBinding.imgvEnlarge.visibility = View.VISIBLE
-           // mDataBinding.imgvEnlarge.startAnimation(AnimationUtils.loadAnimation(this@MainActivity, R.anim.zoom_in))
-        }
-
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -114,25 +79,6 @@ class MainActivity : AppCompatActivity() {
         mViewModel.mItemListLiveData.observe(this@MainActivity, Observer { itemList ->
 
             listItemAdapter.submitList(itemList.toMutableList())
-        })
-
-        listItemAdapter.mSelectedItemLiveData.observe(this@MainActivity, Observer { item ->
-
-           /* selectedListItemPosition = item
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-                val hasPermission = PermissionUtil.checkPermission(this, PermissionUtil.permissionArray)
-
-                if(!hasPermission){
-                    // request permission
-                    PermissionUtil.requestPermission(this@MainActivity, PermissionUtil.permissionArray, PermissionUtil.REQUEST_CAMERA)
-                }else{
-                    capturePicture()
-                }
-            }else{
-                capturePicture()
-            }*/
-           // listItemAdapter.submitList(itemList.toMutableList())
         })
     }
 
@@ -171,10 +117,46 @@ class MainActivity : AppCompatActivity() {
                 setDrawable(ContextCompat.getDrawable(context, R.drawable.divider)!!)
             })
         }
-        listItemAdapter = MultiViewListAdapter(itemClickCallback)
+        listItemAdapter = MultiViewListAdapter(initItemCallback())
         mDataBinding.rviewItem.adapter = listItemAdapter
 
     }
+
+    private fun initItemCallback() : ItemClickedCallback = object : ItemClickedCallback {
+
+            override fun capturePhoto(position: Int, item: ItemModel) {
+                selectedListItemPosition = position
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                    val hasPermission = PermissionUtil.checkPermission(this@MainActivity, PermissionUtil.permissionArray)
+
+                    if(!hasPermission){
+                        // request permission
+                        PermissionUtil.requestPermission(this@MainActivity, PermissionUtil.permissionArray, PermissionUtil.REQUEST_CAMERA)
+                    }else{
+                        capturePicture()
+                    }
+                }else{
+                    capturePicture()
+                }
+            }
+
+            override fun enlargePhoto(item: ItemModel) {
+
+                isPhotoEnlarged = true
+
+                val photoPathFile = item.dataMapModel?.photoPath.run { File(this ?: "") }
+
+                Glide.with(this@MainActivity)
+                    .load(Uri.fromFile(photoPathFile))
+                    .into(mDataBinding.imgvEnlarge)
+
+                mDataBinding.imgvEnlarge.visibility = View.VISIBLE
+                // mDataBinding.imgvEnlarge.startAnimation(AnimationUtils.loadAnimation(this@MainActivity, R.anim.zoom_in))
+            }
+
+        }
+
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.multi_view_menu, menu)
@@ -185,11 +167,13 @@ class MainActivity : AppCompatActivity() {
         if (item.itemId == android.R.id.home)
             onBackPressed()
         else if (item.itemId == R.id.action_print_id) {
-                Toast.makeText(this, "Print Id Clicked", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Print log Clicked, Check Logs in Android Studio", Toast.LENGTH_SHORT).show()
+
+            mViewModel.logListItemId(TAG, listItemAdapter.currentList)
+
         }
         return super.onOptionsItemSelected(item)
     }
-
 
     private fun capturePicture() {
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
@@ -229,8 +213,11 @@ class MainActivity : AppCompatActivity() {
                     val updatedList = listItemAdapter.currentList.apply {
                         this[selectedListItemPosition].dataMapModel?.photoPath = UtilFunction.currentPhotoPath
                     }
-                    listItemAdapter.submitList(null)
-                    listItemAdapter.submitList(ArrayList<ItemModel>().apply { addAll(updatedList) })
+
+                    listItemAdapter.notifyItemChanged(selectedListItemPosition)
+
+                   // listItemAdapter.submitList(null)
+                  //  listItemAdapter.submitList(ArrayList<ItemModel>().apply { addAll(updatedList) })
                 }
             }
         } catch (ex: IOException) {
