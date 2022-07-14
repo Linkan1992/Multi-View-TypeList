@@ -10,6 +10,12 @@ data class DataMapModel(
     @SerializedName(JsonKeys.KEY_PHOTO_PATH)
     var photoPath : String? = null,
     @SerializedName(JsonKeys.KEY_COMMENT)
-    val commentModel : CommentModel? = CommentModel()
+    val commentModel : CommentModel? = CommentModel(),
+
+    var choiceList : List<ChoiceModel>? = null,
+
+    var oldItemSelectedPosition : Int = -1,
+
+    var newItemSelectedPosition : Int = -1
 
 )

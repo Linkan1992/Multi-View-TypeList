@@ -7,20 +7,21 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.MutableLiveData
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.*
 import com.bumptech.glide.Glide
 import com.linkan.multiviewtypelist.R
 import com.linkan.multiviewtypelist.databinding.ItemCommentTypeRowBinding
 import com.linkan.multiviewtypelist.databinding.ItemPhotoTypeRowBinding
 import com.linkan.multiviewtypelist.databinding.ItemSingleChoiceRowBinding
+import com.linkan.multiviewtypelist.dto.DataMapModel
 import com.linkan.multiviewtypelist.dto.ItemModel
 import com.linkan.multiviewtypelist.util.ViewType
 import java.io.File
 
 class MultiViewListAdapter(private val itemClickedCallback: ItemClickedCallback) :
     ListAdapter<ItemModel, MultiViewListAdapter.BaseViewHolder>(ItemModelDiffCallback()) {
+
+    private val viewPool = RecyclerView.RecycledViewPool()
 
     private val selectedItemLiveData : MutableLiveData<Int> = MutableLiveData()
 
@@ -92,7 +93,7 @@ class MultiViewListAdapter(private val itemClickedCallback: ItemClickedCallback)
         }
     }
 
-    class SingleChoiceViewHolder constructor(private val binding: ItemSingleChoiceRowBinding) :
+    inner class SingleChoiceViewHolder constructor(private val binding: ItemSingleChoiceRowBinding) :
         BaseViewHolder(binding) {
 
         override fun bind(item: ItemModel) {
@@ -102,6 +103,33 @@ class MultiViewListAdapter(private val itemClickedCallback: ItemClickedCallback)
             // When a variable or observable changes, the binding will be scheduled to change before
             // the next frame. There are times, however, when binding must be executed immediately.
             // To force execution, use the executePendingBindings() method.
+
+            binding.tvTitle.text = item.title
+
+            // Create Nested RecyclerView
+            val mLayoutManager = LinearLayoutManager(itemView.context)
+            mLayoutManager.orientation = LinearLayoutManager.VERTICAL
+            binding.rviewItemChoice.layoutManager = mLayoutManager
+            binding.rviewItemChoice.itemAnimator = DefaultItemAnimator()
+            binding.rviewItemChoice.adapter = SingleChoiceChildAdapter(object : SingleChoiceCallback{
+                override fun notifyItemChangedToParent() {
+                    /*binding.rviewItemChoice.post {
+                       notifyItemChanged(adapterPosition)
+                    }*/
+
+                    notifyItemChanged(adapterPosition)
+                }
+
+                override fun getDataMapModel(): DataMapModel? {
+                    return item.dataMapModel
+                }
+
+            }).apply {
+
+                 this.submitList(item.dataMapModel?.choiceList?.toMutableList())
+            }
+
+            binding.rviewItemChoice.setRecycledViewPool(viewPool)
         }
 
     }

@@ -5,6 +5,7 @@ import android.content.res.AssetManager
 import android.os.Environment
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.linkan.multiviewtypelist.dto.ChoiceModel
 import com.linkan.multiviewtypelist.dto.ItemModel
 import java.io.File
 import java.io.IOException
@@ -24,8 +25,8 @@ object UtilFunction {
             ioException.printStackTrace()
         }
 
-        val listCountryType = object : TypeToken<List<ItemModel>>() {}.type
-        return Gson().fromJson(jsonString, listCountryType)
+        val listItemType = object : TypeToken<List<ItemModel>>() {}.type
+        return Gson().fromJson(jsonString, listItemType)
     }
 
     lateinit var currentPhotoPath: String
@@ -42,6 +43,14 @@ object UtilFunction {
         ).apply {
             // Save a file: path for use with ACTION_VIEW intents
             currentPhotoPath = absolutePath
+        }
+    }
+
+    fun getChoiceList(choiceOptions : List<String>?) : ArrayList<ChoiceModel> {
+        return ArrayList<ChoiceModel>().apply{
+            choiceOptions?.forEach { choice ->
+                this.add(ChoiceModel(isSelected = false, choiceText = choice))
+            }
         }
     }
 

@@ -22,6 +22,14 @@ class MainViewModel : ViewModel() {
     fun loadItemListFromAsset(assets: AssetManager) {
         viewModelScope.launch(Dispatchers.Default) {
             val itemList = UtilFunction.getItemList(assets)
+
+            // mutating original list by adding the option list
+            // of type model instead of string
+            itemList.forEach {
+                itemModel ->  itemModel.dataMapModel?.choiceList =
+                UtilFunction.getChoiceList(itemModel.dataMapModel?.choiceOptions)
+            }
+
             itemListLiveData.postValue(itemList)
         }
     }

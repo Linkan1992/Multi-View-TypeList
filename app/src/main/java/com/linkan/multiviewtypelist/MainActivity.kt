@@ -20,6 +20,7 @@ import androidx.core.content.FileProvider
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -111,6 +112,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun subscribeToLiveData() {
         mViewModel.mItemListLiveData.observe(this@MainActivity, Observer { itemList ->
+
             listItemAdapter.submitList(itemList.toMutableList())
         })
 
@@ -147,6 +149,7 @@ class MainActivity : AppCompatActivity() {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             //   val dividerItemDecoration = DividerItemDecoration(context,DividerItemDecoration.VERTICAL)
             //   addItemDecoration(dividerItemDecoration)
+            itemAnimator = DefaultItemAnimator()
             addItemDecoration(object : DividerItemDecoration(context, LinearLayoutManager.VERTICAL){
                 override fun getItemOffsets(
                     outRect: Rect,

@@ -24,7 +24,6 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/spacing_16"
             android:layout_marginVertical="@dimen/spacing_16"
-            android:text="Hello World!"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="@string/photo_title" />
