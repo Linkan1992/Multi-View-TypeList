@@ -151,23 +151,6 @@ class MultiViewListAdapter(private val itemClickedCallback: ItemClickedCallback)
         }
     }
 
- /*   abstract class BaseViewHolder constructor(private val binding: ViewDataBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-
-        open fun bind(item: ItemModel) {
-
-            //  binding.pojo = item
-
-            binding.executePendingBindings()
-            // Immediate Binding
-            // When a variable or observable changes, the binding will be scheduled to change before
-            // the next frame. There are times, however, when binding must be executed immediately.
-            // To force execution, use the executePendingBindings() method.
-
-        }
-
-    }*/
-
     abstract class BaseViewHolder constructor(private val binding: ViewDataBinding) :
         RecyclerView.ViewHolder(binding.root) {
 

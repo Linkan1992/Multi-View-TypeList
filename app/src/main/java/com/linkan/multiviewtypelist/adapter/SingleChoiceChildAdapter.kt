@@ -12,9 +12,6 @@ import com.linkan.multiviewtypelist.dto.DataMapModel
 
 class SingleChoiceChildAdapter(private val callback: SingleChoiceCallback) : ListAdapter<ChoiceModel, SingleChoiceViewHolder>(ChoiceModelDiffCallback())  {
 
-    var oldItemSelectedPosition = -1
-    var newItemSelectedPosition = -1
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int, ): SingleChoiceViewHolder =
         SingleChoiceViewHolder(
             ItemChildSingleChoiceBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -36,72 +33,16 @@ class SingleChoiceChildAdapter(private val callback: SingleChoiceCallback) : Lis
             // the next frame. There are times, however, when binding must be executed immediately.
             // To force execution, use the executePendingBindings() method.
 
-            // single choice select logic is pending
 
-         /*   binding.choiceIcon.setOnCheckedChangeListener { button, checked ->
+            binding.choiceIcon.setOnClickListener {
 
-                if (checked){
-                    // updating new selected position
-                    callback.getDataMapModel()?.newItemSelectedPosition = adapterPosition
+                /*
+                 * Below commented code is working solution - 1
+                 * It's a Naive solution which iterates over entire child list
+                 * make other item selection false other than current
+                 */
 
-                    for (item in currentList){
-                        item.isSelected = false
-
-                        if(item == choiceModel) {
-                            callback.getDataMapModel()?.newItemSelectedPosition = adapterPosition
-                            item.isSelected = !item.isSelected
-                        }
-                    }
-
-                    callback.notifyItemChangedToParent()
-                }
-            }*/
-
-                binding.choiceIcon.setOnClickListener {
-
-                   // itemView.setTag(binding.choiceIcon.id, true)
-
-                    // updating new selected position
-                    val dataModel = callback.getDataMapModel()
-                    val list = dataModel?.choiceList
-                    val oldSelectedPosition = dataModel?.newItemSelectedPosition
-
-                    dataModel?.newItemSelectedPosition = adapterPosition
-
-                    list?.let{ choiceList ->
-                        for (item in choiceList){
-                            item.isSelected = false
-
-                            if(item.choiceText == choiceModel.choiceText) {
-                                callback.getDataMapModel()?.newItemSelectedPosition = adapterPosition
-                                item.isSelected = true
-                            }
-                        }
-                    }
-
-                    notifyDataSetChanged()
-
-                //    callback.notifyItemChangedToParent()
-
-                }
-
-       /*     binding.choiceIcon.setOnClickListener {
-
-                    *//*oldItemSelectedPosition = newItemSelectedPosition
-
-                    for (item in currentList){
-                        item.isSelected = false
-
-                        if(item == choiceModel) {
-                            newItemSelectedPosition = adapterPosition
-                            item.isSelected = !item.isSelected
-                        }
-                    }
-
-                    notifyItemChanged(oldItemSelectedPosition)
-                    notifyItemChanged(newItemSelectedPosition)*//*
-
-                  *//*callback.getDataMapModel()?.also { dataMapModel ->
+                /*  callback.getDataMapModel()?.also { dataMapModel ->
                       dataMapModel.oldItemSelectedPosition = dataMapModel.newItemSelectedPosition
 
                       for (item in currentList){
@@ -115,16 +56,37 @@ class SingleChoiceChildAdapter(private val callback: SingleChoiceCallback) : Lis
 
                       notifyItemChanged(dataMapModel.oldItemSelectedPosition)
                       notifyItemChanged(dataMapModel.newItemSelectedPosition)
-                  }*//*
+                  }*/
 
-                  binding.choiceIcon.isChecked
-                  callback.getDataMapModel()?.newItemSelectedPosition
 
-                  callback.notifyItemChangedToParent()
-            }*/
+                /*
+                * Below commented code is working solution - 2
+                * It's a Naive solution which iterates over entire child list
+                * make other item selection false other than current
+                */
+
+                callback.getDataMapModel()?.also { dataMapModel ->
+                    // updating old position
+                    dataMapModel.oldItemSelectedPosition = dataMapModel.newItemSelectedPosition
+                    // updating new position
+                    dataMapModel.newItemSelectedPosition = adapterPosition
+
+                    val itemList = currentList
+
+                    if (dataMapModel.oldItemSelectedPosition > -1){
+
+                        itemList[dataMapModel.oldItemSelectedPosition].isSelected = false
+
+                        notifyItemChanged(dataMapModel.oldItemSelectedPosition)
+                    }
+
+                    itemList[dataMapModel.newItemSelectedPosition].isSelected = true
+                    notifyItemChanged(dataMapModel.newItemSelectedPosition)
+                }
+
+            }
 
             binding.choiceIcon.isChecked = choiceModel.isSelected
-           // binding.choiceIcon.isChecked = adapterPosition == callback.getDataMapModel()?.newItemSelectedPosition
             binding.choiceTitle.text = choiceModel.choiceText
         }
     }
